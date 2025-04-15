@@ -31,31 +31,43 @@ class Maxim:
     def draw(self):
         glPushMatrix()
         glTranslatef(*self.position)
-        glRotatef(-20.0, 1.0, 0.0, 0.0)
-        glColor3f(1.0, 0.8, 0.0)
 
+        # Rotation automatique basée sur la direction
+        vx, vy, vz = self.velocity
+        if vx != 0.0 or vy != 0.0 or vz != 0.0:
+            dir_len = mu.sqrt(vx * vx + vy * vy + vz * vz)
+            if dir_len > 0.0001:
+                # On aligne l'avant du modèle (face -Z) avec la direction de la vélocité
+                yaw = mu.rad2deg(mu.atan2(vx, -vz))  # Yaw : tourne autour de Y
+                pitch = mu.rad2deg(mu.atan2(vy, mu.sqrt(vx * vx + vz * vz)))  # Pitch : tourne autour de X
+                glRotatef(yaw, 0.0, 1.0, 0.0)
+                glRotatef(-pitch, 1.0, 0.0, 0.0)  # vers le haut = -pitch
+
+        # Corps principal
+        glColor3f(1.0, 0.8, 0.0)
         draw_cylinder(self.radius, self.height, slices=32)
 
+        # Dôme doré au sommet
         glPushMatrix()
         glTranslatef(0.0, self.height / 2.0, 0.0)
         draw_hemisphere(self.radius, slices=32, stacks=16)
         glPopMatrix()
 
-        # Visage doré
+        # Visage doré à l'avant (Z+ car modèle tourné vers -Z par défaut)
         glPushMatrix()
         glTranslatef(0.0, self.height / 4.0, self.radius + 0.01)
         glColor3f(1.0, 1.0, 0.0)
         draw_hemisphere(self.radius * 0.4, slices=16, stacks=8)
         glPopMatrix()
 
-        # Cheminée
+        # Cheminée à l'arrière (Z-)
         glPushMatrix()
-        glTranslatef(0.0, self.height + 1.0, 0.0)
+        glTranslatef(0.0, self.height + 0.5, -self.radius / 1.5)
         glColor3f(0.6, 0.6, 0.6)
         draw_cylinder(self.radius * 0.2, 2.0, slices=16)
         glPopMatrix()
 
-        # Hélices
+        # Hélices arrière
         for side in [-1, 1]:
             glPushMatrix()
             glTranslatef(side * (self.radius + 0.2), 0.0, -self.radius * 1.5)
@@ -66,14 +78,14 @@ class Maxim:
                 glRotatef(i * 45, 0.0, 0.0, 1.0)
                 glBegin(GL_QUADS)
                 glVertex3f(-0.05, 0.0, 0.0)
-                glVertex3f( 0.05, 0.0, 0.0)
-                glVertex3f( 0.05, 0.8, 0.0)
+                glVertex3f(0.05, 0.0, 0.0)
+                glVertex3f(0.05, 0.8, 0.0)
                 glVertex3f(-0.05, 0.8, 0.0)
                 glEnd()
                 glPopMatrix()
             glPopMatrix()
 
-        # Rames (nombreuses)
+        # Rames (latérales)
         for side in [-1, 1]:
             for i in range(8):
                 glPushMatrix()
