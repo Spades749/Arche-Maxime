@@ -1,19 +1,32 @@
-﻿from OpenGL.GLU import *
+from OpenGL.GLU import *
+from maths_utils import sqrt
 
 class Camera:
-    def __init__(self, target=None, offset=[0.0, 5.0, 15.0]):
+    def __init__(self, target=None, distance=30.0, height=8.0):  # 🔁 Zoom out
         self.target = target
-        self.offset = offset
-        tx, ty, tz = target.position if target else [0.0, 0.0, 0.0]
-        ox, oy, oz = offset
-        self.position = [tx + ox, ty + oy, tz + oz]
+        self.distance = distance
+        self.height = height
+        self.position = [0.0, 0.0, 0.0]
 
     def update(self):
         if self.target is None:
             return
+
         tx, ty, tz = self.target.position
-        ox, oy, oz = self.offset
-        self.position = [tx + ox, ty + oy, tz + oz]
+        vx, vy, vz = self.target.velocity
+
+        speed_sq = vx * vx + vy * vy + vz * vz
+        if speed_sq > 0.0001:
+            speed = sqrt(speed_sq)
+            nx = vx / speed
+            ny = vy / speed
+            nz = vz / speed
+        else:
+            nx, ny, nz = 0.0, 0.0, 1.0
+
+        self.position[0] = tx - nx * self.distance
+        self.position[1] = ty - ny * self.distance + self.height
+        self.position[2] = tz - nz * self.distance
 
     def look(self):
         if self.target:
