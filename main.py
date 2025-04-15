@@ -11,7 +11,7 @@ import geometry
 
 def draw_text(x, y, text, font, color=(255, 255, 255)):
     surface = font.render(text, True, color)
-    surface = surface.convert_alpha()  # ← Garde l’alpha (important)
+    surface = surface.convert_alpha()
     text_data = pygame.image.tostring(pygame.transform.flip(surface, False, True), "RGBA", True)
     w, h = surface.get_size()
 
@@ -34,7 +34,7 @@ def draw_text(x, y, text, font, color=(255, 255, 255)):
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
 
-    glColor4f(1, 1, 1, 1)  # ← transparence active
+    glColor4f(1, 1, 1, 1)
     glBegin(GL_QUADS)
     glTexCoord2f(0, 0); glVertex2f(x, y)
     glTexCoord2f(1, 0); glVertex2f(x + w, y)
@@ -53,26 +53,26 @@ def draw_text(x, y, text, font, color=(255, 255, 255)):
     glPopMatrix()
     glMatrixMode(GL_MODELVIEW)
 
-# 🎮 Init
+# Init
 pygame.init()
 width, height = 1280, 720
 pygame.display.set_mode((width, height), DOUBLEBUF | OPENGL)
 pygame.display.set_caption("Arche Maxim")
-font = pygame.font.Font("SPACE.otf", 20)  # ← police par défaut toujours dispo
+font = pygame.font.Font("SPACE.otf", 20)
 
-# 🌕 Moon & Earth
+# Moon & Earth
 moon_position = [0.0, 0.0, 1000.0]
 moon_radius = 5.0
 earth_position = [0.0, 0.0, 0.0]
 earth_mass = 1000.0
 earth_radius = 10.0
 
-# 🚀 Arche & Cam
+# Arche & Cam
 ark = Maxim(position=[0.0, 0.0, -earth_radius - 2.0], radius=2.0, height=4.0)
 ark.set_velocity_towards(moon_position, speed=11.2)
 cam = Camera(target=ark, distance=30.0, height=8.0)
 
-# ✨ Stars
+# Stars
 stars = []
 for _ in range(2000):
     x = random.uniform(-150, 150)
@@ -84,7 +84,7 @@ for _ in range(2000):
     phase = random.uniform(0.0, 2 * mu.PI)
     stars.append([x, y, z, b, amp, freq, phase])
 
-# 🎨 OpenGL
+# OpenGL
 glEnable(GL_DEPTH_TEST)
 glClearColor(0.0, 0.0, 0.0, 1.0)
 glPointSize(2)
@@ -93,7 +93,7 @@ glLoadIdentity()
 gluPerspective(45.0, width / float(height), 0.1, 500.0)
 glMatrixMode(GL_MODELVIEW)
 
-# 🕒 Loop
+# Loop
 clock = pygame.time.Clock()
 running = True
 
@@ -151,7 +151,7 @@ while running:
     glVertex3f(*right)
     glEnd()
 
-    # --- Étoiles scintillantes ---
+    # --- Stars ---
     t = pygame.time.get_ticks() / 1000.0
     glBegin(GL_POINTS)
     for x, y, z, b, a, f, p in stars:
@@ -184,7 +184,7 @@ while running:
     for i, (_, F) in enumerate(ark.ui_forces):
         x0 = 60
         y0 = height - 80 - i * 40
-        fx = F[0] * 200  # ← flèche plus longue
+        fx = F[0] * 200
         fy = F[1] * 200
         glLineWidth(4)
         glColor3f(1.0, 0.0, 0.0)

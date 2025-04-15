@@ -1,0 +1,30 @@
+﻿Arche Maxim :
+- 1 cylindre principal (corps de l'arche)
+- 1 demi-sphère supérieure (coiffe)
+- 1 demi-sphère avant (nez de l'arche)
+- 1 cheminée cylindrique (arrière)
+- 2 groupes d'hélices latérales (8 pales par côté)
+- 2 séries de rameurs (paddles, 8 de chaque côté)
+
+- Masse : 10kg
+- Rayon : 2m
+- Hauteur : 4m
+
+Formule de volume d'un cylindre : V = π R^2 H = π * 2^2 * 4 = 16π ≈ 50.27m3
+
+Avec une densité arbitraire ρ fixée à 0.2, la masse obtenue est cohérente avec la valeur codée :
+m = ρ * V = 0.2 * 50.27 ≈ 10.05kg
+
+Centre d'inertie :
+G = (0, 0, 0)
+
+La matrice d'inertie est réduite à l'axe Y (rotation autour de l'axe vertical) :
+I = 0.5 * m * R^2 = 0.5 * 10 * 4 = 20.0kg/m2
+
+Force appliquées :
+- Gravité terrestre (Terre -> Arche)
+- Force moteur (moteur -> Lune)
+
+Accélérations :
+Linéaire : a = F / m (m/s2)
+Angulaire : α = Γ / I (rad/s2)

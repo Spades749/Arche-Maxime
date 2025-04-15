@@ -15,12 +15,12 @@ class Maxim:
         self.counting_escape = False
         self.rotate_model = False
         self.forces = []
-        self.ui_forces = []  # ← Ajout : forces pour affichage UI
+        self.ui_forces = []
 
         self.angular_velocity = 0.0
         self.rotation_angle = 0.0
         self.mass = 10.0
-        self.I = 0.5 * self.mass * radius * radius
+        self.I = 0.5 * self.mass * radius * radius # I = 1/2 m R², moment d’inertie pour un cylindre autour de l’axe Y
 
     def apply_gravity_from(self, source_pos, source_mass, source_radius, moon_pos):
         G = 0.5
@@ -32,7 +32,7 @@ class Maxim:
         if dist_sq < (source_radius + 150) ** 2:
             dist = mu.sqrt(dist_sq)
             force_mag = G * source_mass / dist_sq
-            ax = force_mag * dx / dist
+            ax = force_mag * dx / dist # Accélération linéaire
             ay = force_mag * dy / dist
             az = force_mag * dz / dist
             self.velocity[0] += ax
@@ -50,7 +50,7 @@ class Maxim:
                 speed = dist / 12.0
                 self.velocity = [direction[i] * speed for i in range(3)]
 
-                print("🌌 L’Arche Maxim a quitté l’attraction terrestre !")
+                print("L’Arche Maxim a quitté l’attraction terrestre !")
 
     def set_velocity_towards(self, target, speed):
         direction = [target[i] - self.position[i] for i in range(3)]
@@ -64,10 +64,10 @@ class Maxim:
     def apply_force(self, r, F):
         moment = mu.cross_product_3d(r, F)
         torque_y = moment[1]
-        angular_acc = torque_y / self.I
+        angular_acc = torque_y / self.I # Moment d’inertie autour de l’axe Y + accélération angulaire
         self.angular_velocity += angular_acc
         self.forces.append((r, F))
-        self.ui_forces.append((r, F))  # ← Ajout : enregistre force pour UI
+        self.ui_forces.append((r, F))
 
     def mouvement(self, F, r, dt):
         acc = [f / self.mass for f in F]
@@ -84,9 +84,9 @@ class Maxim:
         if self.counting_escape:
             self.escape_timer += dt
         if mu.distance3d(self.position, target) <= self.radius + target_radius:
-            print("🚀 Collision avec la lune !")
+            print("Collision avec la lune !")
             if self.counting_escape:
-                print(f"⏱️ Temps depuis sortie Terre : {self.escape_timer:.1f} secondes")
+                print(f"Temps depuis sortie Terre : {self.escape_timer:.1f} secondes")
             self.stopped = True
             self.counting_escape = False
 
