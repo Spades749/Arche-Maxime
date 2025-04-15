@@ -34,7 +34,6 @@ def draw_cylinder(radius, height, slices=16):
 
 def draw_sphere(radius, slices=16, stacks=16, phi_start=0.0, phi_end=PI):
     from OpenGL.GL import glBegin, glEnd, glVertex3f, GL_TRIANGLE_FAN, GL_QUAD_STRIP
-    from maths_utils import sin, cos
 
     if phi_start == 0.0:
         next_phi = (phi_end - phi_start) / stacks
