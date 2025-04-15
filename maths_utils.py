@@ -55,4 +55,33 @@ def distance3d(p1, p2):
     dx = p2[0] - p1[0]
     dy = p2[1] - p1[1]
     dz = p2[2] - p1[2]
-    return sqrt(dx * dx + dy * dy + dz * dz)
+    return sqrt(dx*dx + dy*dy + dz*dz)
+
+def cross_product_3d(a, b):
+    return [
+        a[1]*b[2] - a[2]*b[1],
+        a[2]*b[0] - a[0]*b[2],
+        a[0]*b[1] - a[1]*b[0]
+    ]
+
+def vector_length(v):
+    return sqrt(v[0]*v[0] + v[1]*v[1] + v[2]*v[2])
+
+def normalize3d(v):
+    l = vector_length(v)
+    return [v[i]/l for i in range(3)] if l > 0 else [0.0, 0.0, 0.0]
+
+def vector_scale(v, s):
+    return [v[i]*s for i in range(3)]
+
+def vector_add(a, b):
+    return [a[i]+b[i] for i in range(3)]
+
+def draw_vector_arrow(pos, dir_vec, color=(1.0, 0.0, 0.0)):
+    from OpenGL.GL import glBegin, glEnd, glColor3f, glVertex3f, GL_LINES
+    glColor3f(*color)
+    glBegin(GL_LINES)
+    glVertex3f(*pos)
+    endpoint = vector_add(pos, dir_vec)
+    glVertex3f(*endpoint)
+    glEnd()

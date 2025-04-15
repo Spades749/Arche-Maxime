@@ -14,6 +14,13 @@ class Maxim:
         self.escape_timer = 0.0
         self.counting_escape = False
         self.rotate_model = False
+        self.forces = []
+        self.ui_forces = []  # ← Ajout : forces pour affichage UI
+
+        self.angular_velocity = 0.0
+        self.rotation_angle = 0.0
+        self.mass = 10.0
+        self.I = 0.5 * self.mass * radius * radius
 
     def apply_gravity_from(self, source_pos, source_mass, source_radius, moon_pos):
         G = 0.5
@@ -40,7 +47,6 @@ class Maxim:
                 direction = [moon_pos[i] - self.position[i] for i in range(3)]
                 dist = mu.sqrt(sum(d * d for d in direction))
                 direction = [d / dist for d in direction]
-
                 speed = dist / 12.0
                 self.velocity = [direction[i] * speed for i in range(3)]
 
@@ -55,11 +61,26 @@ class Maxim:
             factor = speed / dist
             self.velocity = [direction[i] * factor for i in range(3)]
 
+    def apply_force(self, r, F):
+        moment = mu.cross_product_3d(r, F)
+        torque_y = moment[1]
+        angular_acc = torque_y / self.I
+        self.angular_velocity += angular_acc
+        self.forces.append((r, F))
+        self.ui_forces.append((r, F))  # ← Ajout : enregistre force pour UI
+
+    def mouvement(self, F, r, dt):
+        acc = [f / self.mass for f in F]
+        delta_v = mu.vector_scale(acc, dt)
+        self.velocity = mu.vector_add(self.velocity, delta_v)
+        self.apply_force(r, F)
+
     def update(self, dt, target, target_radius):
         if self.stopped:
             return
         for i in range(3):
             self.position[i] += self.velocity[i] * dt
+        self.rotation_angle += mu.rad2deg(self.angular_velocity) * dt
         if self.counting_escape:
             self.escape_timer += dt
         if mu.distance3d(self.position, target) <= self.radius + target_radius:
@@ -72,15 +93,8 @@ class Maxim:
     def draw(self):
         glPushMatrix()
         glTranslatef(*self.position)
-
         if self.rotate_model:
-            vx, vy, vz = self.velocity
-            dir_len = mu.sqrt(vx * vx + vy * vy + vz * vz)
-            if dir_len > 0.0001:
-                yaw = mu.rad2deg(mu.atan2(vx, -vz))
-                pitch = mu.rad2deg(mu.atan2(vy, mu.sqrt(vx * vx + vz * vz)))
-                glRotatef(yaw, 0.0, 1.0, 0.0)
-                glRotatef(-pitch, 1.0, 0.0, 0.0)
+            glRotatef(self.rotation_angle, 0.0, 1.0, 0.0)
 
         glColor3f(1.0, 0.8, 0.0)
         draw_cylinder(self.radius, self.height, slices=32)
