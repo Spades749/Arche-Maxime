@@ -9,6 +9,7 @@ class Maxim:
         self.height = height
         self.velocity = [0.0, 0.0, 0.0]
         self.stopped = False
+        self.angle = -20.0
 
     def set_velocity_towards(self, target, speed):
         direction = [target[i] - self.position[i] for i in range(3)]
@@ -24,14 +25,30 @@ class Maxim:
             return
         for i in range(3):
             self.position[i] += self.velocity[i] * dt
-        if mu.distance3d(self.position, target) <= self.radius + target_radius:
+        
+        dist = mu.distance3d(self.position, target)
+        collision_dist = self.radius + target_radius
+        max_dist = 100.0  # Distance max avant de commencer à redresser
+        
+        if dist < max_dist and dist > collision_dist:
+            dist_range = max_dist - collision_dist
+            closeness = 1.0 - (dist - collision_dist) / dist_range
+            if closeness < 0.0:
+                closeness = 0.0
+            if closeness > 1.0:
+                closeness = 1.0
+            self.angle = -20.0 + (110.0 * closeness)
+        elif dist <= collision_dist:
+            self.angle = 0.0
+        
+        if dist <= collision_dist:
             print("🚀 Collision avec la lune !")
             self.stopped = True
 
     def draw(self):
         glPushMatrix()
         glTranslatef(*self.position)
-        glRotatef(-20.0, 1.0, 0.0, 0.0)
+        glRotatef(self.angle, 1.0, 0.0, 0.0)
         glColor3f(1.0, 0.8, 0.0)
 
         draw_cylinder(self.radius, self.height, slices=32)
