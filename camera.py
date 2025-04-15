@@ -2,7 +2,7 @@ from OpenGL.GLU import *
 from maths_utils import sqrt
 
 class Camera:
-    def __init__(self, target=None, distance=30.0, height=8.0):  # 🔁 Zoom out
+    def __init__(self, target=None, distance=30.0, height=8.0):
         self.target = target
         self.distance = distance
         self.height = height

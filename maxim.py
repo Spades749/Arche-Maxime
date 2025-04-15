@@ -11,8 +11,9 @@ class Maxim:
         self.velocity = [0.0, 0.0, 0.0]
         self.stopped = False
         self.escaped_earth = False
-        self.escape_timer = 0.0  # ⏱️ temps accumulé depuis sortie
+        self.escape_timer = 0.0
         self.counting_escape = False
+        self.rotate_model = False
 
     def apply_gravity_from(self, source_pos, source_mass, source_radius, moon_pos):
         G = 0.5
@@ -34,16 +35,13 @@ class Maxim:
             if not self.escaped_earth:
                 self.escaped_earth = True
                 self.counting_escape = True
+                self.rotate_model = True
 
-                # Calcul direction normale vers la lune
                 direction = [moon_pos[i] - self.position[i] for i in range(3)]
                 dist = mu.sqrt(sum(d * d for d in direction))
                 direction = [d / dist for d in direction]
 
-                # Fixer une durée exacte de voyage
-                desired_time = 12.0  # secondes
-                speed = dist / desired_time
-
+                speed = dist / 12.0
                 self.velocity = [direction[i] * speed for i in range(3)]
 
                 print("🌌 L’Arche Maxim a quitté l’attraction terrestre !")
@@ -75,9 +73,8 @@ class Maxim:
         glPushMatrix()
         glTranslatef(*self.position)
 
-        # Orientation
-        vx, vy, vz = self.velocity
-        if vx != 0.0 or vy != 0.0 or vz != 0.0:
+        if self.rotate_model:
+            vx, vy, vz = self.velocity
             dir_len = mu.sqrt(vx * vx + vy * vy + vz * vz)
             if dir_len > 0.0001:
                 yaw = mu.rad2deg(mu.atan2(vx, -vz))

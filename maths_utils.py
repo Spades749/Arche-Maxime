@@ -12,13 +12,13 @@ def rad2deg(rad):
 def cos(x):
     s = 0
     for i in range(10):
-        s += (-1) ** i * x ** (2 * i) / fact(2 * i)
+        s += (-1)**i * (x**(2*i)) / fact(2*i)
     return s
 
 def sin(x):
     s = 0
     for i in range(10):
-        s += (-1) ** i * x ** (2 * i + 1) / fact(2 * i + 1)
+        s += (-1)**i * (x**(2*i + 1)) / fact(2*i + 1)
     return s
 
 def sqrt(x, iterations=10):
@@ -28,15 +28,14 @@ def sqrt(x, iterations=10):
     return r
 
 def atan(x):
-    # approximation de arctan(x) avec développement limité de Maclaurin
     if x < -1.0:
-        return -PI / 2 - atan(1.0 / x)
+        return -PI/2 - atan(1.0 / x)
     elif x > 1.0:
-        return PI / 2 - atan(1.0 / x)
+        return PI/2 - atan(1.0 / x)
     s = 0
     for i in range(10):
-        coef = (-1) ** i / (2 * i + 1)
-        s += coef * (x ** (2 * i + 1))
+        coef = (-1)**i / (2*i + 1)
+        s += coef * (x**(2*i + 1))
     return s
 
 def atan2(y, x):
@@ -56,4 +55,4 @@ def distance3d(p1, p2):
     dx = p2[0] - p1[0]
     dy = p2[1] - p1[1]
     dz = p2[2] - p1[2]
-    return sqrt(dx*dx + dy*dy + dz*dz)
+    return sqrt(dx * dx + dy * dy + dz * dz)
