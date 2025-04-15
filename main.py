@@ -1,4 +1,4 @@
-﻿import random
+import random
 import pygame
 from pygame.locals import *
 from OpenGL.GL import *
@@ -9,12 +9,13 @@ from maxim import Maxim
 import maths_utils as mu
 import geometry
 
+# 🎮 Initialisation
 pygame.init()
 width, height = 1280, 720
 pygame.display.set_mode((width, height), DOUBLEBUF | OPENGL)
 pygame.display.set_caption("Arche Maxim")
 
-# OpenGL initialisation
+# 🎨 OpenGL
 glEnable(GL_DEPTH_TEST)
 glDepthFunc(GL_LESS)
 glClearColor(0.0, 0.0, 0.0, 1.0)
@@ -22,22 +23,31 @@ glPointSize(2)
 
 glMatrixMode(GL_PROJECTION)
 glLoadIdentity()
-gluPerspective(45.0, width / float(height), 0.1, 300.0)
+gluPerspective(45.0, width / float(height), 0.1, 500.0)
 glMatrixMode(GL_MODELVIEW)
 glLoadIdentity()
 
-# Lune
+# 🌍 Terre
+earth_position = [0.0, 0.0, 0.0]
+earth_mass = 1000.0
+earth_radius = 10.0
+
+# 🌕 Lune (fixée suffisamment loin pour ~10-15s de trajet)
 moon_radius = 5.0
-moon_position = [0.0, 0.0, -100.0]
+moon_position = [0.0, 0.0, 1000.0]
 
-# Arche Maxim + vitesse
-ark = Maxim(position=[20.0, 0.0, 0.0], radius=2.0, height=4.0)
-ark.set_velocity_towards(moon_position, speed=10.0)
 
-# Caméra third person dynamique, suit l'Arche par l'arrière
-cam = Camera(target=ark, distance=18.0, height=6.0)
+# 🚀 Arche Maxim
+ark = Maxim(position=[0.0, 0.0, -earth_radius - 2.0], radius=2.0, height=4.0)
 
-# Génération d'étoiles
+# 🎯 Vitesse initiale vers la lune
+initial_speed = 11.2  # m/s
+ark.set_velocity_towards(moon_position, speed=initial_speed)
+
+# 🎥 Caméra
+cam = Camera(target=ark, distance=30.0, height=8.0)
+
+# ✨ Étoiles
 stars = []
 for _ in range(200):
     r = random.uniform(50.0, 100.0)
@@ -48,7 +58,7 @@ for _ in range(200):
     z = r * u
     stars.append([x, y, z])
 
-# Boucle principale
+# 🕒 Boucle principale
 clock = pygame.time.Clock()
 running = True
 
@@ -59,33 +69,40 @@ while running:
         if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
             running = False
 
-    # Mise à jour
+    # ⚙️ Physique
+    ark.apply_gravity_from(earth_position, earth_mass, earth_radius)
     ark.update(dt, moon_position, moon_radius)
     cam.update()
 
-    # Affichage
+    # 🎨 Rendu
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
     glLoadIdentity()
-    cam.look()  # Mise à jour de la caméra
+    cam.look()
 
-    # Lune
+    # 🌍 Terre
+    glPushMatrix()
+    glTranslatef(*earth_position)
+    glColor3f(0.0, 0.2, 1.0)
+    geometry.draw_sphere(earth_radius, slices=32, stacks=16)
+    glPopMatrix()
+
+    # 🌕 Lune (fixe)
     glPushMatrix()
     glTranslatef(*moon_position)
     glColor3f(0.8, 0.8, 0.8)
     geometry.draw_sphere(moon_radius, slices=32, stacks=16)
     glPopMatrix()
 
-    # Arche
+    # 🚀 Arche
     ark.draw()
 
-    # Étoiles
+    # ✨ Étoiles
     glColor3f(1.0, 1.0, 1.0)
     glBegin(GL_POINTS)
     for s in stars:
         glVertex3f(*s)
     glEnd()
 
-    # Finalisation frame
     pygame.display.flip()
 
 pygame.quit()
