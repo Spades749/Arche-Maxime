@@ -1,6 +1,6 @@
 ﻿from geometry import assemble_maxim
 from maths_utils import somme_vect, prod_vect_scal, dist, vect
-from OpenGL.GL import glBegin, glVertex3f, glEnd, glColor3f, GL_POINTS
+from OpenGL.GL import glBegin, glVertex3f, glEnd, glColor3f, glPointSize, GL_POINTS
 
 class ArcheMaxim:
     def __init__(self, R=2, H=6, n=10000, masse=100):
@@ -10,7 +10,7 @@ class ArcheMaxim:
         self.masse = masse
         self.pos = [0, 0, 0]
         self.v = [0, 0, 0]
-        self.points = assemble_maxim(n, R, H)
+        self.points = assemble_maxim(1000, R, H)
         self.stop = False
 
     def step(self, F, h, lune_pos, lune_radius):
@@ -31,7 +31,8 @@ class ArcheMaxim:
         self.v = new_v
 
     def draw(self):
-        glColor3f(1, 1, 0)  # Arche Maxim en jaune
+        glColor3f(1.0, 1.0, 0.0)  # Jaune Arche
+        glPointSize(10)  # GROS points pour bien voir
         glBegin(GL_POINTS)
         for p in self.points:
             glVertex3f(*p)
